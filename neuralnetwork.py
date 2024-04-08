@@ -5,7 +5,7 @@ import pandas as pd
 class NeuralNetwork:
     def __init__(self, input_neurons: int=784, hidden_neurons: int=10, output_neurons: int=10) -> None:
         """
-        - 785 Input Neurons (for each pixel, MNIST 28x28px image)
+        - 784 Input Neurons (for each pixel, MNIST 28x28px image)
         - 10 Hidden Neurons
         - 10 Output Neurons (for numbers 0 - 9)
         """ 
@@ -21,7 +21,7 @@ class NeuralNetwork:
 
     def softmax(self, x: np.array) -> np.array:
         return np.exp(x) / sum(np.exp(x))
-
+    
     def one_hot(self, Y: np.array) -> np.array:
         one_hot_Y = np.zeros((Y.size, Y.max() + 1))
         one_hot_Y[np.arange(Y.size), Y] = 1
@@ -54,15 +54,12 @@ class NeuralNetwork:
             self.w2 -= learning_rate * dW2
             self.b2 -= learning_rate * db2
 
-            # Calculate loss. 
-            loss = np.mean(A2 - one_hot_y)
-
             if verbose:
                 if epoch % 10 == 0:
                     print()
                     predictions = self.get_predictions(A2) 
                     print(predictions, y)
-                    print(f"Epoch {epoch}, Loss: {self.get_accuracy(predictions, y)}")
+                    print(f"Epoch {epoch}, Accuracy: {self.get_accuracy(predictions, y)}")
 
     def get_accuracy(self, predictions, y):
         return np.sum(predictions == y) / y.size
@@ -80,6 +77,9 @@ class NeuralNetwork:
         output = np.argmax(A2, 0)
         return output
 
+    def evaluate(self, X, y) -> float:
+        pass
+
     def save_weights(self) -> None:
         with open('parameters.npy', 'wb') as f:
             np.save(f, self.w1)
@@ -94,6 +94,7 @@ class NeuralNetwork:
             self.w2 = np.load(f)
             self.b2 = np.load(f)
 
+
 def read_data(file: str) -> tuple[np.array, np.array]: 
     data = pd.read_csv(file)
     data = np.array(data).T
@@ -102,11 +103,17 @@ def read_data(file: str) -> tuple[np.array, np.array]:
 
 
 if __name__ == '__main__':
+    # Create training data. 
     X_train, y_train = read_data('train.csv')
-    
+
     # Create a NeuralNet. 
     nn = NeuralNetwork(784, 10, 10)
     
     # Train the NeuralNet.
-    nn.train(X_train, y_train, 1000, 0.01, True)
-    nn.save_weights()
+    # nn.train(X_train, y_train, 1000, 0.01, True)
+    # nn.save_weights()
+    
+     # Load weights and bias.
+    nn.load_weights()
+
+    nn.evaluate()
