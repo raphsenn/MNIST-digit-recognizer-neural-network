@@ -80,6 +80,19 @@ class NeuralNetwork:
         output = np.argmax(A2, 0)
         return output
 
+    def save_weights(self) -> None:
+        with open('parameters.npy', 'wb') as f:
+            np.save(f, self.w1)
+            np.save(f, self.b1)
+            np.save(f, self.w2)
+            np.save(f, self.b2)
+    
+    def load_weights(self) -> None:
+        with open('parameters.npy', 'rb') as f:
+            self.w1 = np.load(f)
+            self.b1 = np.load(f)
+            self.w2 = np.load(f)
+            self.b2 = np.load(f)
 
 def read_data(file: str) -> tuple[np.array, np.array]: 
     data = pd.read_csv(file)
@@ -95,4 +108,5 @@ if __name__ == '__main__':
     nn = NeuralNetwork(784, 10, 10)
     
     # Train the NeuralNet.
-    nn.train(X_train, y_train, 500, 0.001, True)
+    nn.train(X_train, y_train, 1000, 0.01, True)
+    nn.save_weights()
